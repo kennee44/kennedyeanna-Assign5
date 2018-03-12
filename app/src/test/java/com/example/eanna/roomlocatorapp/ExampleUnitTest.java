@@ -1,4 +1,4 @@
-package com.example.eanna.googlemaps;
+package com.example.eanna.roomlocatorapp;
 
 import org.junit.Test;
 
