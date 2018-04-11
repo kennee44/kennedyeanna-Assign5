@@ -1,0 +1,54 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="15dp"
+    android:layout_marginBottom="15dp"
+    android:background="@color/cardview_light_background"
+    >
+
+    <RelativeLayout
+        android:layout_width="251dp"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp">
+
+        <TextView
+            android:id="@+id/textview_building"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="DUB03"
+            tools:text="DUB03" />
+
+        <TextView
+            android:id="@+id/textview_name_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/textview_building"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Room Name" />
+
+        <TextView
+            android:id="@+id/textview_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textview_building"
+            android:layout_toRightOf="@id/textview_building"
+            android:text="Room Floor"
+            android:textSize="15sp"
+
+            android:layout_marginStart="8dp"/>
+
+
+
+
+
+
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

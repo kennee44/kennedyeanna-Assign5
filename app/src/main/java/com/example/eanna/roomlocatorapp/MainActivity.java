@@ -1,6 +1,6 @@
 package com.example.eanna.roomlocatorapp;
 
-import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -13,19 +13,37 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+
+/**
+ * This app is a Room Locator app.  It's primary function is to give the location of a room.
+ *
+ *
+ * <p>
+ * The app is to help employees find the location of a room using it's name.
+ * It offers information about the room, amenities it offers and it's capacity.
+ * A short video will give you a feel for it's size and dimensions.
+ * </p>
+ *
+ * Citation: Class contains code adapted from URL:
+ * <a href="https://www.youtube.com/watch?v=5ISNPFmuOU8&list=PLrnPJCHvNZuBMJmll0xy2L2McYInT3aiu">
+ *     YouTube: SQLite + RecyclerView Tutorial - Android Programming</a> (2018-03-12)
+ *
+ * * Class that contains
+ *<p> Intent openCamera
+ * @author Eanna Kennedy
+ * @version 256
+ * @param MediaStore ACTION_IMAGE_CAPTURE
+ * @param File Environment.getExternalStorageDirectory(), filename
+ * @param MediaStore EXTRA_OUTPUT</p>
+ *
+ */
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText mEditTextName;
-    private TextView mTextViewAmount;
-    private int mAmount = 0;
     private SQLiteDatabase mDatabase;
 
     //member variable for our adpater
-    private GroceryAdapter mAdapter;
+    private RVAdapter mRVAdapter;
 
 
     @Override
@@ -33,54 +51,39 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // create database so we can add values to it
-        GroceryDBHelper dbHelper = new GroceryDBHelper(this);
+
+
+        // Create database using the DBHelperClass to create database
+        final DBHelperClass dbHelper = new DBHelperClass(this);
         mDatabase = dbHelper.getWritableDatabase();
 
-        //assign our RV and adapter below wirting of db
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
-        //choose layout as Linear
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        // pass context and a cursor. We get this cursor by calling getAllItems
-        //which queries all our Grocery Table
-        mAdapter = new GroceryAdapter(this, getAllItems());
+        //Assign our RecyclerView using Linear format
+        RecyclerView recyclerViewRooms = (RecyclerView) findViewById(R.id.recyclerview);
+        recyclerViewRooms.setLayoutManager(new LinearLayoutManager(this));
+        
 
-        recyclerView.setAdapter(mAdapter);
+        // Set adapter to recyclerViewRooms.  The content is from a cursor by calling getAllItems method
+         
+        mRVAdapter = new RVAdapter(this, getAllItems());
+        recyclerViewRooms.setAdapter(mRVAdapter);
 
 
+        //Set OnClickListener to the adapter. Takes position as parameter.
 
-        mEditTextName = (EditText) findViewById(R.id.edittext_name);
-        mTextViewAmount = (TextView) findViewById(R.id.textview_amount);
-
-        //create button variables
-        Button buttonIncrease = (Button) findViewById(R.id.button_increase);
-        Button buttonDecrease = (Button) findViewById(R.id.button_decrease);
-        Button buttonAdd = (Button) findViewById(R.id.button_add);
-
-        //set onClickListeners for the buttons
-
-        buttonIncrease.setOnClickListener(new View.OnClickListener() {
+        mRVAdapter.setOnItemClickListener(new RVAdapter.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                increase();
+            public void onItemCLick(int position) {
+                // Intent to send position of Adapter to Room Details Activity using mykey2
+                Intent intent = new Intent(MainActivity.this, RoomDetails.class);
+                // Cursor cursor = (Cursor) adapter.getItem(position);
+                // intent.putExtra("mykey", SQLTableStructure.TableColumns.COLUMN_FLOOR);
+                intent.putExtra("mykey2", position);
+                startActivity(intent);
             }
         });
 
-        buttonDecrease.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                decrease();
-            }
-        });
-
-        buttonAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addItem();
-            }
-        });
-
-
+        //
+       // mRVAdapter.swapCursor(getAllItems());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -115,62 +116,34 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    private void increase() {
-        mAmount++;
-        mTextViewAmount.setText((String.valueOf(mAmount)));
-    }
 
-    private void decrease() {
-        if(mAmount >0) {
-        mAmount--;
-        mTextViewAmount.setText((String.valueOf(mAmount)));}
-    }
 
-    private void addItem () {
 
-        // does are edittext have any value and is amount greater than zero
-        if(mEditTextName.getText().toString().trim().length() == 0 || mAmount == 0)
-        {
-            return;
-        }
+    /**
+     * This getAllItems() method of type Cursor returns an SQLiteCursor for an Android SQLite database query.
+     * <p> Returns all the entries from our roomList Table in the DBHelperClass.
+     * We will pass this to our RecyclerView Adapter
+     * We will assign our Recycler View and Adapter in the Main method</p>
+     *  <p>
+     *  @return mDatabase.query
+     *
+     * </p>
+     *
+     **/
 
-        String name = mEditTextName.getText().toString();
-        //create content values to add records to the database
-        //This is the connection between EditText and Column in database (Table name: groceryList)
-        ContentValues cv = new ContentValues();
-        //cv.put(String key, String value)
-
-        cv.put(GroceryContract.GroceryEntry.COLUMN_NAME, name);
-        cv.put(GroceryContract.GroceryEntry.COLUMN_AMOUNT, mAmount);
-
-        mDatabase.insert(GroceryContract.GroceryEntry.TABLE_NAME, null,cv);
-        // last thing to do. Take our adapter and swap the cursor
-        mAdapter.swapCursor(getAllItems());
-
-        mEditTextName.getText().clear();
-    }
-
-    // Need a method to return a cursor because we have to pass a cursor to our Adapter
-    // We will assign our Recycler View and Adapter in the Main method
-
-    //We have a private method of type Cursor
-    //THis will get all the items our of our Grocery Table ordered by TImestamp
-    //Newest item is at the top
     private Cursor getAllItems()
     {
         return mDatabase.query
-        (  // Table, columns, selection, selectionARgs, groupBy, having, orderBy
-           GroceryContract.GroceryEntry.TABLE_NAME,
-                //these are all filters we don't need
-                null, null, null, null, null,
-            GroceryContract.GroceryEntry.COLUMN_TIMESTAMP + " DESC"
-            //Close the method with a semicolon
-        );
+                (  // Table, columns, selection, selectionARgs, groupBy, having, orderBy
+                        SQLTableStructure.TableColumns.TABLE_NAME,
+                        //these are all filters we don't need
+                        null, null, null, null, null,
+                        SQLTableStructure.TableColumns.COLUMN_NAME + " ASC"
+                        //Close the method with a semicolon
+                );
     }
-
 
 }
