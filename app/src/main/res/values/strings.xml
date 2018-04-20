@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">RoomLocatorApp</string>
+    <string name="action_settings">Settings</string>
+    <string name="name">name</string>
+    <string name="city">City:</string>
+    <string name="building">Building:</string>
+    <string name="floor">Floor:</string>
+    <string name="location">Location:</string>
+    <string name="direction">Direction:</string>
+    <string name="capacity">Capacity:</string>
+    <string name="amenities">Amenities:</string>
+    <string name="SearchHint">Search Rooms Type First Letter</string>
+    <string name="room_floor">Room Floor</string>
+    <string name="floor_number">Floor Number:</string>
+    <string name="building_number">Building Number:</string>
+    <string name="cityRV">City:</string>
+</resources>
